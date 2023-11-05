@@ -25,7 +25,7 @@ module.exports = defineConfig({
       }
     },
     //vue自己启动的端口
-    port:1121,
+    port:80,
     historyApiFallback: true,
     allowedHosts: "all"
   }

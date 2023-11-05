@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5fb2a835-ff90-4b05-a78a-933c9781ed80" name="变更" comment="update" />
+    <list default="true" id="5fb2a835-ff90-4b05-a78a-933c9781ed80" name="变更" comment="update">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vue.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/vue.config.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -88,6 +91,7 @@
       <workItem from="1699169413501" duration="13660000" />
       <workItem from="1699183254551" duration="522000" />
       <workItem from="1699183781384" duration="41000" />
+      <workItem from="1699187830372" duration="294000" />
     </task>
     <task id="LOCAL-00001" summary="删除文件 .gitignore">
       <created>1699182962717</created>
