@@ -306,7 +306,7 @@ body {
 
 .dialog {
   border-radius: 15px;
-  box-shadow: 0px 0px 8px rgba(245, 212, 7, 0.57);
+  box-shadow: 0px 0px 8px rgba(245, 212, 7, 0.3);
   background: rgba(255, 255, 255, 0.88);
   width: 200px;
 }
