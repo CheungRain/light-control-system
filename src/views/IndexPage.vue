@@ -70,10 +70,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted, onUnmounted} from 'vue';
 import { ElSwitch, ElButton, ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElMessage } from 'element-plus';
 import axios from "axios";
+let recognition;
+let isListening = ref(false);
+const startListening = () => {
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'zh-CN';
+  recognition.onstart = () => {
+    isListening.value = true;
+  };
 
+  recognition.onend = () => {
+    isListening.value = false;
+  };
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        transcript += event.results[i][0].transcript;
+      }
+    }
+
+    if (transcript.includes('开灯')) {
+      lights.value[0].isOn = 1;
+    } else if (transcript.includes('关灯')) {
+      lights.value[0].isOn = 0;
+    }
+  };
+
+  recognition.start();
+};
+
+
+onMounted(() => {
+  startListening();
+});
+
+onUnmounted(() => {
+  startListening();
+});
 ElMessage.success('欢迎登录');
 
 const lights = ref([
@@ -240,6 +281,9 @@ const confirmTime = (light) => {
     ElMessage.error("请选择定时开关和定时时间")
   }
 };
+
+
+
 
 </script>
 
