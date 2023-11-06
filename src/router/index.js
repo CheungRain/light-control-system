@@ -7,7 +7,7 @@ const routes = [
         component: () => import('../App'),
     },
     {
-        path: '/index',
+        path: '/',
         name: 'IndexPage',
         meta:{
             title:"首页"
@@ -15,7 +15,7 @@ const routes = [
         component: () => import('../views/IndexPage'),
     },
     {
-        path: '/',
+        path: '/test',
         name: 'testPage',
         meta:{
             title:"首页"

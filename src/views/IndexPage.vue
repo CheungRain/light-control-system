@@ -1,10 +1,12 @@
 <template>
   <div class="container">
     <div v-for="light in lights" :key="light.id" class="light">
-      <div class="light-wrapper" >
-        <div class="light-status">
-          <div>{{ light.name }}</div>
-          <div>{{ light.isOn ? '已开启' : '已关闭' }}</div>
+      <div :class="{'light-wrapper-on': light.isOn, 'light-wrapper-off': !light.isOn}">
+        <div class="light-status" @click="light.showTimerDialog = true">
+          <div :class="{'light-name-on': light.isOn, 'light-name-off': !light.isOn}">{{ light.name }}</div>
+          <div :class="{'on': light.isOn, 'off': !light.isOn}">
+            {{ light.isOn ? '已开启' : '已关闭' }}
+          </div>
         </div>
         <div class="light-switch">
           <el-switch
@@ -17,10 +19,10 @@
           </el-switch>
         </div>
         <div class="light-timer-countdown" @click="light.showTimerDialog = true">
-          <el-text v-if="light.timerStatus===true && light.isTimerOnOff===1">
+          <el-text class="light-timer-countdown-on" v-if="light.timerStatus===true && light.isTimerOnOff===1">
             还有{{light.timerTimeCopy}}秒开启
           </el-text>
-          <el-text v-else-if="light.timerStatus===true && light.isTimerOnOff===0">
+          <el-text class="light-timer-countdown-off" v-else-if="light.timerStatus===true && light.isTimerOnOff===0">
             还有{{light.timerTimeCopy}}秒关闭
           </el-text>
           <el-text v-else>
@@ -28,15 +30,14 @@
           </el-text>
         </div>
       </div>
-      <el-dialog
-          class="dialog"
-          v-model="light.showTimerDialog"
-          title="设置定时"
-          @close="light.showTimerDialog = false">
+      <el-dialog class="dialog mobile-dialog"
+                 v-model="light.showTimerDialog"
+                 title="设置定时"
+                 @close="light.showTimerDialog = false">
         <el-form>
           <el-form-item label="定时开关">
             <el-select
-                class="select"
+                class="select light-timer-select"
                 v-model="light.isTimerOnOff"
                 placeholder="请选择">
               <el-option
@@ -49,7 +50,7 @@
           </el-form-item>
           <el-form-item label="定时时间">
             <el-select
-                class="select"
+                class="select light-timer-select"
                 v-model="light.timerTime"
                 placeholder="请选择">
               <el-option
@@ -60,8 +61,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-button class="button" @click="confirmTime(light)">确认</el-button>
-          <el-button class="button" @click="cancelTime(light)">取消</el-button>
+          <el-button class="button light-timer-confirm-button" @click="confirmTime(light)">确认</el-button>
+          <el-button class="button light-timer-cancel-button" @click="cancelTime(light)">取消</el-button>
         </el-form>
       </el-dialog>
     </div>
@@ -84,7 +85,8 @@ const lights = ref([
     timerTime: null,
     timerTimeCopy: null,
     timerStatus: false,
-    showTimerDialog: false
+    showTimerDialog: false,
+    timerInterval: null
   },
   {
     id: 2,
@@ -94,7 +96,8 @@ const lights = ref([
     timerTime: null,
     timerTimeCopy: null,
     timerStatus: false,
-    showTimerDialog: false
+    showTimerDialog: false,
+    timerInterval: null
   },
   {
     id: 3,
@@ -104,7 +107,8 @@ const lights = ref([
     timerTime: null,
     timerTimeCopy: null,
     timerStatus: false,
-    showTimerDialog: false
+    showTimerDialog: false,
+    timerInterval: null
   },
   {
     id: 4,
@@ -114,7 +118,8 @@ const lights = ref([
     timerTime: null,
     timerTimeCopy: null,
     timerStatus: false,
-    showTimerDialog: false
+    showTimerDialog: false,
+    timerInterval: null
   },
   {
     id: 5,
@@ -124,7 +129,8 @@ const lights = ref([
     timerTime: null,
     timerTimeCopy: null,
     timerStatus: false,
-    showTimerDialog: false
+    showTimerDialog: false,
+    timerInterval: null
   }
 ]);
 
@@ -166,7 +172,6 @@ const onOff = ref([
   }
 ]);
 
-let timerInterval;
 
 const switchChange = (light) => {
   // const url = 'api'+light.id.toString()+'/led_'+light.id.toString()
@@ -193,7 +198,7 @@ const cancelTime = (light) =>{
     // axios.post(url, data, config).then(response => {
     //   console.log(response.data)
     // })
-    clearInterval(timerInterval);
+    clearInterval(light.timerInterval);
     light.isTimerOnOff = null;
     light.timerTime = null;
     light.timerStatus = false;
@@ -220,12 +225,12 @@ const confirmTime = (light) => {
     light.showTimerDialog = false;
     light.timerStatus = true;
     light.timerTimeCopy = light.timerTime;
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
+    clearInterval(light.timerInterval);
+    light.timerInterval = setInterval(() => {
       if (light.timerTimeCopy > 1) {
         light.timerTimeCopy--;
       } else {
-        clearInterval(timerInterval);
+        clearInterval(light.timerInterval);
         ElMessage.success(light.name.toString()+"定时时间到了")
         light.timerStatus = false;
         light.isOn = light.isTimerOnOff;
@@ -242,7 +247,6 @@ const confirmTime = (light) => {
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff;
 }
 
 .container {
@@ -258,11 +262,20 @@ body {
   margin-bottom: 20px;
 }
 
-.light-wrapper {
-  border: 1px solid #ccc;
+.light-wrapper-on {
+  border: 1px solid rgb(19, 206, 102);
   padding: 20px;
-  border-radius: 15px;
-  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0px 0px 3px rgb(19, 206, 102);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.light-wrapper-off {
+  border: 1px solid rgb(255, 73, 73);
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 1px rgb(255, 73, 73);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .light-status {
@@ -271,14 +284,75 @@ body {
   margin-bottom: 10px;
 }
 
+.light-name-on{
+  color: rgb(19, 206, 102);
+}
+
+.light-name-off{
+  color: rgb(255, 73, 73);
+}
+
+.on{
+  color: rgb(19, 206, 102);
+}
+
+.off{
+  color: rgb(255, 73, 73);
+}
+
 .light-switch {
   margin-bottom: 10px;
 }
 
-.dialog{
-  background-size: auto;
-  border-radius: 20px;
+.dialog {
+  border-radius: 15px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.88);
   width: 200px;
 }
+
+.dialog::before {
+  content: "";
+  background: inherit;
+  filter: blur(20px) brightness(0.7);
+  position: absolute;
+  top: -10px;
+  bottom: -10px;
+  right: -10px;
+  left: -10px;
+  z-index: -1;
+  border-radius: inherit;
+  width: 200px;
+}
+
+.mobile-dialog .el-dialog__body {
+  padding: 14px 20px !important;
+}
+
+.light-timer-select {
+  width: 100%;
+}
+
+.light-timer-confirm-button {
+  margin-top: 20px;
+  background-color: rgb(19, 206, 102);
+  border: none;
+  color: white;
+}
+
+.light-timer-cancel-button {
+  margin-top: 20px;
+  background-color: rgb(255, 73, 73);
+  border: none;
+  color: white;
+}
+.light-timer-countdown-on{
+  color: rgb(19, 206, 102);
+}
+
+.light-timer-countdown-off{
+  color: rgb(255, 73, 73);
+}
+
 
 </style>
