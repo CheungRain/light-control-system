@@ -1,7 +1,6 @@
 <template>
   <div class="container">
-    <el-button type="button" @click="RecordAudio">语音识别</el-button>
-    <br />
+    <el-button class="audio-button" type="button" @click="RecordAudio"></el-button>
     <div v-for="light in lights" :key="light.id" class="light">
       <div :class="{'light-wrapper-on': light.isOn, 'light-wrapper-off': !light.isOn}">
         <div class="light-status" @click="light.showTimerDialog = true">
@@ -78,6 +77,7 @@ import axios from "axios";
 import Recorder from "js-audio-recorder";
 
 ElMessage.success('欢迎登录');
+let audio_button = false;
 const lights = ref([
   {
     id: 1,
@@ -344,6 +344,7 @@ const confirmTime = (light) => {
 body {
   margin: 0;
   padding: 0;
+  background-color: white;
 }
 
 .container {
@@ -375,7 +376,7 @@ body {
   background: rgba(255, 255, 255, 0.9);
 }
 
-.light-status {
+.light-status{
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
@@ -405,7 +406,7 @@ body {
   border-radius: 15px;
   box-shadow: 0px 0px 8px rgba(245, 212, 7, 0.3);
   background: rgba(255, 255, 255, 0.88);
-  width: 200px;
+  width: 250px;
 }
 
 .dialog::before {
@@ -419,7 +420,7 @@ body {
   left: -10px;
   z-index: -1;
   border-radius: inherit;
-  width: 200px;
+  width: 250px;
 }
 
 .mobile-dialog {
@@ -428,6 +429,14 @@ body {
 
 .light-timer-select {
   width: 100%;
+}
+
+.audio-button{
+  width: 270px;
+  border-radius: 8px;
+  background:inherit;
+  border: none;
+  color: #ffffff;
 }
 
 .light-timer-confirm-button {
