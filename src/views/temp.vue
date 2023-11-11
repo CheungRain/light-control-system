@@ -1,7 +1,5 @@
 <template>
   <div class="container">
-    <el-button type="button" @click="RecordAudio">语音识别</el-button>
-    <br />
     <div v-for="light in lights" :key="light.id" class="light">
       <div :class="{'light-wrapper-on': light.isOn, 'light-wrapper-off': !light.isOn}">
         <div class="light-status" @click="light.showTimerDialog = true">
@@ -72,12 +70,53 @@
 </template>
 
 <script setup>
-import { ref} from 'vue';
+import { ref,onMounted, onUnmounted} from 'vue';
 import { ElSwitch, ElButton, ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElMessage } from 'element-plus';
 import axios from "axios";
-import Recorder from "js-audio-recorder";
+let recognition;
+let isListening = ref(false);
+const startListening = () => {
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'zh-CN';
+  recognition.onstart = () => {
+    isListening.value = true;
+  };
 
+  recognition.onend = () => {
+    isListening.value = false;
+  };
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        transcript += event.results[i][0].transcript;
+      }
+    }
+
+    if (transcript.includes('开灯')) {
+      lights.value[0].isOn = 1;
+    } else if (transcript.includes('关灯')) {
+      lights.value[0].isOn = 0;
+    }
+  };
+
+  recognition.start();
+};
+
+
+onMounted(() => {
+  startListening();
+});
+
+onUnmounted(() => {
+  startListening();
+});
 ElMessage.success('欢迎登录');
+
 const lights = ref([
   {
     id: 1,
@@ -173,98 +212,6 @@ const onOff = ref([
     value: 0
   }
 ]);
-
-const blobToBase64 = (blob, callback) => {
-  const reader = new FileReader();
-  reader.onload = function (result) {
-    const base64String = window.btoa(
-        String.fromCharCode(...new Uint8Array(result.target.result))
-    );
-    callback(base64String);
-  };
-  reader.readAsArrayBuffer(blob);
-};
-
-const recorder = new Recorder({
-  sampleBits: 16,
-  sampleRate: 16000,
-  numChannels: 1,
-});
-
-const RecordAudio = () => {
-  ElMessage.success('开始识别')
-  // console.log("开始录音")
-  recorder.start()
-  setTimeout(()=>{
-    //ElMessage.warning('停止识别')
-    // console.log("停止录音");
-    const file = recorder.getPCMBlob();
-    const file_len = file.size;
-    blobToBase64(file, (base64String) => {
-      const base64 = base64String;
-      const token = '24.19950bee43802d550f29b4d12c5015e3.2592000.1702287353.282335-42750245'
-      const format = 'pcm';
-      const rate = 16000;
-      const channel = 1;
-      const cuid = '5Bg3dVi0WNfWISubL00qxugrCQX5q5NN';
-      const dev_pid =  1537;
-      const speech = base64;
-      const len = file_len;
-      const url = 'api0/server_api'
-      const data = {
-        token: token,
-        format: format,
-        rate: rate,
-        channel: channel,
-        cuid: cuid,
-        dev_pid: dev_pid,
-        speech: speech,
-        len: len
-      };
-      const config = {
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        }
-      }
-      axios.post(url, data, config).then(response => {
-        const audio_string = response.data.result[0].replace(/[^\u4e00-\u9fa5]/g, '');
-        console.log(audio_string)
-        ElMessage.warning(audio_string)
-        if(audio_string.includes('打开灯一')){
-          lights.value[0].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯一')){
-          lights.value[0].isOn = 0;
-        }
-        if(audio_string.includes('打开灯二')){
-          lights.value[1].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯二')){
-          lights.value[1].isOn = 0;
-        }
-        if(audio_string.includes('打开灯三')){
-          lights.value[2].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯三')){
-          lights.value[2].isOn = 0;
-        }
-        if(audio_string.includes('打开灯四')){
-          lights.value[3].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯四')){
-          lights.value[3].isOn = 0;
-        }
-        if(audio_string.includes('打开灯五')){
-          lights.value[4].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯五')){
-          lights.value[4].isOn = 0;
-        }
-      })
-    });
-  },3000);
-};
 
 
 const switchChange = (light) => {
@@ -422,7 +369,7 @@ body {
   width: 200px;
 }
 
-.mobile-dialog {
+.mobile-dialog .el-dialog__body {
   padding: 14px 20px !important;
 }
 
