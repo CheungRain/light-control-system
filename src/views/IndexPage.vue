@@ -567,14 +567,14 @@ body {
   width: 100%;
 }
 
-.audio-button{
+.audio-button {
   margin-top: 10px;
   margin-bottom: 10px;
   width: 270px;
   border-radius: 8px;
-  background:inherit;
+  background: rgb(255, 255, 255);
   border: none;
-  color: #ffffff;
+  color: rgb(9, 196, 238);
 }
 
 .light-timer-confirm-button {
@@ -597,6 +597,5 @@ body {
 .light-timer-countdown-off{
   color: rgb(255, 73, 73);
 }
-
 
 </style>

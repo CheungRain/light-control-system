@@ -99,7 +99,7 @@
       <workItem from="1699694671622" duration="8070000" />
       <workItem from="1699706206755" duration="12982000" />
       <workItem from="1699756224830" duration="3076000" />
-      <workItem from="1699760057481" duration="17133000" />
+      <workItem from="1699760057481" duration="18947000" />
     </task>
     <task id="LOCAL-00001" summary="删除文件 .gitignore">
       <created>1699182962717</created>
@@ -199,7 +199,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699777560744</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="update">
+      <created>1699778508668</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1699778508668</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
