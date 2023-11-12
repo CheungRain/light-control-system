@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5fb2a835-ff90-4b05-a78a-933c9781ed80" name="变更" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/IndexPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/IndexPage.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -98,7 +97,9 @@
       <workItem from="1699618197800" duration="11945000" />
       <workItem from="1699670668898" duration="7912000" />
       <workItem from="1699694671622" duration="8070000" />
-      <workItem from="1699706206755" duration="11506000" />
+      <workItem from="1699706206755" duration="12982000" />
+      <workItem from="1699756224830" duration="3076000" />
+      <workItem from="1699760057481" duration="10679000" />
     </task>
     <task id="LOCAL-00001" summary="删除文件 .gitignore">
       <created>1699182962717</created>
@@ -170,7 +171,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699714288916</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="update">
+      <created>1699718391756</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1699718391756</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

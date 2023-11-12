@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-button class="audio-button" type="button" @click="RecordAudio"></el-button>
+    <el-button class="audio-button" type="button" @click="RecordAudio">语音识别</el-button>
     <div v-for="light in lights" :key="light.id" class="light">
       <div :class="{'light-wrapper-on': light.isOn, 'light-wrapper-off': !light.isOn}">
         <div class="light-status" @click="light.showTimerDialog = true">
@@ -71,24 +71,56 @@
 </template>
 
 <script setup>
-import { ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import { ElSwitch, ElButton, ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElMessage } from 'element-plus';
 import axios from "axios";
 import Recorder from "js-audio-recorder";
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioContext.createAnalyser();
+analyser.fftSize = 256;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+const micVolume = ref(0);
+let audio = false;
+const detectVolume = () => {
+  analyser.getByteFrequencyData(dataArray);
+  let sum = 0;
+  for(let i = 0; i < bufferLength; i++){
+    sum += dataArray[i];
+  }
+  const volume = sum / bufferLength;
+  micVolume.value = volume;
 
+  if(volume>2000 && audio==true){
+    RecordAudio();
+  }
+  requestAnimationFrame(detectVolume);
+}
+onMounted(() => {
+  detectVolume()
+  navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        detectVolume();
+      })
+      .catch(err => {
+        console.error('Error getting user media:', err);
+      });
+});
 ElMessage.success('欢迎登录');
-let audio_button = false;
+
 const lights = ref([
   {
-    id: 1,
-    name: '灯1',
-    isOn: 0,
-    isTimerOnOff: null,
-    timerTime: null,
-    timerTimeCopy: null,
-    timerStatus: false,
-    showTimerDialog: false,
-    timerInterval: null
+    id: 1,//灯的id号
+    name: '灯1',//灯的名称
+    isOn: 0,//灯的当前开关状态0是关1是开
+    isTimerOnOff: null,//灯的定时状态
+    timerTime: null,//灯的定时时间
+    timerTimeCopy: null,//灯定时时间的拷贝用于显示定时倒计时
+    timerStatus: false,//灯的定时状态
+    showTimerDialog: false,//灯定时对话框的弹出
+    timerInterval: null//灯定时倒计时器
   },
   {
     id: 2,
@@ -176,8 +208,8 @@ const onOff = ref([
 
 const blobToBase64 = (blob, callback) => {
   const reader = new FileReader();
-  reader.onload = function (result) {
-    const base64String = window.btoa(
+  reader.onload = (result) => {
+    const base64String = btoa(
         String.fromCharCode(...new Uint8Array(result.target.result))
     );
     callback(base64String);
@@ -192,15 +224,16 @@ const recorder = new Recorder({
 });
 
 const RecordAudio = () => {
+  audio = true;
   ElMessage.success('开始识别')
   // console.log("开始录音")
   recorder.start()
   setTimeout(()=>{
-    //ElMessage.warning('停止识别')
+    ElMessage.warning('停止识别')
     // console.log("停止录音");
-    const file = recorder.getPCMBlob();
-    const file_len = file.size;
-    blobToBase64(file, (base64String) => {
+    const pcmBlob = recorder.getPCMBlob();
+    const pcmBlob_len = pcmBlob.size;
+    blobToBase64(pcmBlob, (base64String) => {
       const base64 = base64String;
       const token = '24.19950bee43802d550f29b4d12c5015e3.2592000.1702287353.282335-42750245'
       const format = 'pcm';
@@ -209,7 +242,7 @@ const RecordAudio = () => {
       const cuid = '5Bg3dVi0WNfWISubL00qxugrCQX5q5NN';
       const dev_pid =  1537;
       const speech = base64;
-      const len = file_len;
+      const len = pcmBlob_len;
       const url = 'api0/server_api'
       const data = {
         token: token,
@@ -230,40 +263,110 @@ const RecordAudio = () => {
       axios.post(url, data, config).then(response => {
         const audio_string = response.data.result[0].replace(/[^\u4e00-\u9fa5]/g, '');
         console.log(audio_string)
-        ElMessage.warning(audio_string)
-        if(audio_string.includes('打开灯一')){
-          lights.value[0].isOn = 1;
+        //ElMessage.warning(audio_string)
+        if(audio_string.includes('定') || audio_string.includes('时')){
+          if(audio_string.includes('开')){
+            if(audio_string.includes('一')){
+              lights.value[0].timerStatus = true;
+              lights.value[0].timerTime = 30;
+              lights.value[0].isTimerOnOff = 1;
+              confirmTime(lights.value[0]);
+            }
+            if(audio_string.includes('二')){
+              lights.value[1].timerStatus = true;
+              lights.value[1].timerTime = 30;
+              lights.value[1].isTimerOnOff = 1;
+              confirmTime(lights.value[1]);
+            }
+            if(audio_string.includes('三')){
+              lights.value[2].timerStatus = true;
+              lights.value[2].timerTime = 30;
+              lights.value[2].isTimerOnOff = 1;
+              confirmTime(lights.value[2]);
+            }
+            if(audio_string.includes('四')){
+              lights.value[3].timerStatus = true;
+              lights.value[3].timerTime = 30;
+              lights.value[3].isTimerOnOff = 1;
+              confirmTime(lights.value[3]);
+            }
+            if(audio_string.includes('五')){
+              lights.value[4].timerStatus = true;
+              lights.value[4].timerTime = 30;
+              lights.value[4].isTimerOnOff = 1;
+              confirmTime(lights.value[4]);
+            }
+          }else if(audio_string.includes('关')){
+            if(audio_string.includes('一')){
+              lights.value[0].timerStatus = true;
+              lights.value[0].timerTime = 30;
+              lights.value[0].isTimerOnOff = 0;
+              confirmTime(lights.value[0]);
+            }
+            if(audio_string.includes('二')){
+              lights.value[1].timerStatus = true;
+              lights.value[1].timerTime = 30;
+              lights.value[1].isTimerOnOff = 0;
+              confirmTime(lights.value[1]);
+            }
+            if(audio_string.includes('三')){
+              lights.value[2].timerStatus = true;
+              lights.value[2].timerTime = 30;
+              lights.value[2].isTimerOnOff = 0;
+              confirmTime(lights.value[2]);
+            }
+            if(audio_string.includes('四')){
+              lights.value[3].timerStatus = true;
+              lights.value[3].timerTime = 30;
+              lights.value[3].isTimerOnOff = 0;
+              confirmTime(lights.value[3]);
+            }
+            if(audio_string.includes('五')){
+              lights.value[4].timerStatus = true;
+              lights.value[4].timerTime = 30;
+              lights.value[4].isTimerOnOff = 0;
+              confirmTime(lights.value[4]);
+            }
+          }
+        }else if(audio_string.includes('打') || audio_string.includes('开')){
+          if(audio_string.includes('一')){
+            lights.value[0].isOn = 1;
+          }
+          if(audio_string.includes('二')){
+            lights.value[1].isOn = 1;
+          }
+          if(audio_string.includes('三')){
+            lights.value[2].isOn = 1;
+          }
+          if(audio_string.includes('四')){
+            lights.value[3].isOn = 1;
+          }
+          if(audio_string.includes('五')){
+            lights.value[4].isOn = 1;
+          }
+        }else if(audio_string.includes('关') || audio_string.includes('闭')){
+          if(audio_string.includes('一')){
+            lights.value[0].isOn = 0;
+          }
+          if(audio_string.includes('二')){
+            lights.value[1].isOn = 0;
+          }
+          if(audio_string.includes('三')){
+            lights.value[2].isOn = 0;
+          }
+          if(audio_string.includes('四')){
+            lights.value[3].isOn = 0;
+          }
+          if(audio_string.includes('五')){
+            lights.value[4].isOn = 0;
+          }
         }
-        if(audio_string.includes('关闭灯一')){
-          lights.value[0].isOn = 0;
-        }
-        if(audio_string.includes('打开灯二')){
-          lights.value[1].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯二')){
-          lights.value[1].isOn = 0;
-        }
-        if(audio_string.includes('打开灯三')){
-          lights.value[2].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯三')){
-          lights.value[2].isOn = 0;
-        }
-        if(audio_string.includes('打开灯四')){
-          lights.value[3].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯四')){
-          lights.value[3].isOn = 0;
-        }
-        if(audio_string.includes('打开灯五')){
-          lights.value[4].isOn = 1;
-        }
-        if(audio_string.includes('关闭灯五')){
-          lights.value[4].isOn = 0;
-        }
+      }).catch((error) => {
+        console.log(error)
       })
     });
-  },3000);
+    audio = false;
+  },5000);
 };
 
 
@@ -341,10 +444,11 @@ const confirmTime = (light) => {
 </script>
 
 <style>
+
 body {
   margin: 0;
   padding: 0;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .container {
@@ -432,6 +536,8 @@ body {
 }
 
 .audio-button{
+  margin-top: 10px;
+  margin-bottom: 10px;
   width: 270px;
   border-radius: 8px;
   background:inherit;
