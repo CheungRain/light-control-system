@@ -91,7 +91,7 @@ const detectVolume = () => {
   const volume = sum / bufferLength;
   micVolume.value = volume;
 
-  if(volume>2000 && audio==true){
+  if(volume>2000 && audio==false){
     RecordAudio();
   }
   requestAnimationFrame(detectVolume);
@@ -264,7 +264,23 @@ const RecordAudio = () => {
         const audio_string = response.data.result[0].replace(/[^\u4e00-\u9fa5]/g, '');
         console.log(audio_string)
         //ElMessage.warning(audio_string)
-        if(audio_string.includes('定') || audio_string.includes('时')){
+        if(audio_string.includes('取') || audio_string.includes('消')){
+          if(audio_string.includes('一')){
+            cancelTime(lights.value[0]);
+          }
+          if(audio_string.includes('二')){
+            cancelTime(lights.value[1]);
+          }
+          if(audio_string.includes('三')){
+            cancelTime(lights.value[2]);
+          }
+          if(audio_string.includes('四')){
+            cancelTime(lights.value[3]);
+          }
+          if(audio_string.includes('五')){
+            cancelTime(lights.value[4]);
+          }
+        }else if(audio_string.includes('定') || audio_string.includes('时')){
           if(audio_string.includes('开')){
             if(audio_string.includes('一')){
               lights.value[0].timerStatus = true;
@@ -331,34 +347,44 @@ const RecordAudio = () => {
         }else if(audio_string.includes('打') || audio_string.includes('开')){
           if(audio_string.includes('一')){
             lights.value[0].isOn = 1;
+            switchChange(lights.value[0]);
           }
           if(audio_string.includes('二')){
             lights.value[1].isOn = 1;
+            switchChange(lights.value[1]);
           }
           if(audio_string.includes('三')){
             lights.value[2].isOn = 1;
+            switchChange(lights.value[2]);
           }
           if(audio_string.includes('四')){
             lights.value[3].isOn = 1;
+            switchChange(lights.value[3]);
           }
           if(audio_string.includes('五')){
             lights.value[4].isOn = 1;
+            switchChange(lights.value[4]);
           }
         }else if(audio_string.includes('关') || audio_string.includes('闭')){
           if(audio_string.includes('一')){
             lights.value[0].isOn = 0;
+            switchChange(lights.value[0]);
           }
           if(audio_string.includes('二')){
             lights.value[1].isOn = 0;
+            switchChange(lights.value[1]);
           }
           if(audio_string.includes('三')){
             lights.value[2].isOn = 0;
+            switchChange(lights.value[2]);
           }
           if(audio_string.includes('四')){
             lights.value[3].isOn = 0;
+            switchChange(lights.value[3]);
           }
           if(audio_string.includes('五')){
             lights.value[4].isOn = 0;
+            switchChange(lights.value[4]);
           }
         }
       }).catch((error) => {
@@ -366,7 +392,7 @@ const RecordAudio = () => {
       })
     });
     audio = false;
-  },5000);
+  },3900);
 };
 
 
