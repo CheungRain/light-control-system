@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-button class="audio-button" type="button" @click="RecordAudio">语音识别</el-button>
+    <el-button class="audio-button" @click="RecordAudio">语音识别{{countAudioTime}}秒</el-button>
     <div v-for="light in lights" :key="light.id" class="light">
       <div :class="{'light-wrapper-on': light.isOn, 'light-wrapper-off': !light.isOn}">
         <div class="light-status" @click="light.showTimerDialog = true">
@@ -82,6 +82,7 @@ const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
 const micVolume = ref(0);
 let audio = false;
+
 const detectVolume = () => {
   analyser.getByteFrequencyData(dataArray);
   let sum = 0;
@@ -91,18 +92,18 @@ const detectVolume = () => {
   const volume = sum / bufferLength;
   micVolume.value = volume;
 
-  if(volume>2000 && audio==false){
+  if(volume>50 && audio==true){
     RecordAudio();
   }
   requestAnimationFrame(detectVolume);
 }
 onMounted(() => {
-  detectVolume()
+  //detectVolume()
   navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
         const source = audioContext.createMediaStreamSource(stream);
         source.connect(analyser);
-        detectVolume();
+        //detectVolume();
       })
       .catch(err => {
         console.error('Error getting user media:', err);
@@ -206,6 +207,9 @@ const onOff = ref([
   }
 ]);
 
+let countAudio;
+let countAudioTime = ref(3);
+
 const blobToBase64 = (blob, callback) => {
   const reader = new FileReader();
   reader.onload = (result) => {
@@ -224,13 +228,22 @@ const recorder = new Recorder({
 });
 
 const RecordAudio = () => {
+  clearInterval(countAudio);
   audio = true;
   ElMessage.success('开始识别')
   // console.log("开始录音")
   recorder.start()
+  countAudio = setInterval(()=>{
+    if(countAudioTime.value>1){
+      countAudioTime.value--;
+    }else{
+      countAudioTime.value=3
+    }
+  },1250);
   setTimeout(()=>{
     ElMessage.warning('停止识别')
     // console.log("停止录音");
+    clearInterval(countAudio);
     const pcmBlob = recorder.getPCMBlob();
     const pcmBlob_len = pcmBlob.size;
     blobToBase64(pcmBlob, (base64String) => {
@@ -494,7 +507,7 @@ body {
   border: 1px solid rgb(19, 206, 102);
   padding: 20px;
   border-radius: 20px;
-  box-shadow: 0px 0px 3px rgb(19, 206, 102);
+  box-shadow: 0px 0px 4px rgb(19, 206, 102);
   background: rgba(255, 255, 255, 0.9);
 }
 
