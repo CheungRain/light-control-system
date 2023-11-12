@@ -43,7 +43,7 @@ const RecordAudio = () => {
       const dev_pid =  1537;
       const speech = base64;
       const len = file_len;
-      const url = 'api0/server_api'
+      const url = '/api0/server_api'
       const data = {
         token: token,
         format: format,

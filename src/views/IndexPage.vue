@@ -249,7 +249,7 @@ const RecordAudio = () => {
       const dev_pid =  1537;
       const speech = base64;
       const len = pcmBlob_len;
-      const url = 'api0/server_api'
+      const url = '/api0/server_api'
       const data = {
         token: token,
         format: format,
@@ -403,7 +403,7 @@ const RecordAudio = () => {
 
 
 const switchChange = (light) => {
-  // const url = 'api'+light.id.toString()+'/led_'+light.id.toString()
+  // const url = '/api'+light.id.toString()+'/led_'+light.id.toString()
   // const data = {
   //   button: light.isOn
   // };

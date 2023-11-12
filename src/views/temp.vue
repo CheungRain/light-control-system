@@ -215,7 +215,7 @@ const onOff = ref([
 
 
 const switchChange = (light) => {
-  // const url = 'api'+light.id.toString()+'/led_'+light.id.toString()
+  // const url = '/api'+light.id.toString()+'/led_'+light.id.toString()
   // const data = {
   //   button: light.isOn
   // };
