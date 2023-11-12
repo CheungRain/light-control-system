@@ -72,3 +72,6 @@ module.exports = defineConfig({
     https: true
   }
 })
+// An highlighted block
+require('events').EventEmitter.defaultMaxListeners = 0;
+
