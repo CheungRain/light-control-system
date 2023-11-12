@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-button class="audio-button" @click="RecordAudio">语音识别{{countAudioTime}}秒</el-button>
+    <el-button class="audio-button" @click="RecordAudio"></el-button>
     <div v-for="light in lights" :key="light.id" class="light">
       <div :class="{'light-wrapper-on': light.isOn, 'light-wrapper-off': !light.isOn}">
         <div class="light-status" @click="light.showTimerDialog = true">
@@ -207,9 +207,6 @@ const onOff = ref([
   }
 ]);
 
-let countAudio;
-let countAudioTime = ref(3);
-
 const blobToBase64 = (blob, callback) => {
   const reader = new FileReader();
   reader.onload = (result) => {
@@ -228,22 +225,18 @@ const recorder = new Recorder({
 });
 
 const RecordAudio = () => {
-  clearInterval(countAudio);
+  if ("vibrate" in navigator) {
+    navigator.vibrate([10, 50, 10]);
+  } else {
+    console.log('抱歉，您的浏览器不支持震动效果');
+  }
   audio = true;
   ElMessage.success('开始识别')
   // console.log("开始录音")
   recorder.start()
-  countAudio = setInterval(()=>{
-    if(countAudioTime.value>1){
-      countAudioTime.value--;
-    }else{
-      countAudioTime.value=3
-    }
-  },1250);
   setTimeout(()=>{
     ElMessage.warning('停止识别')
     // console.log("停止录音");
-    clearInterval(countAudio);
     const pcmBlob = recorder.getPCMBlob();
     const pcmBlob_len = pcmBlob.size;
     blobToBase64(pcmBlob, (base64String) => {
